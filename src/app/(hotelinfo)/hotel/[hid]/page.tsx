@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import getHotel from "@/libs/getHotel";
 import HotelBookingPanel from "@/components/HotelBookingPanel";
-import StarRating from "./StarRating";
+import ReviewForm from "./ReviewForm";
+import ReviewList from "./ReviewList";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
@@ -11,16 +12,15 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ hi
     const { data: hotel } = await getHotel(hid);
     const session = await getServerSession(authOptions);
 
-    // Calculate average rating
-    const avgRating = hotel.ratings && hotel.ratings.length > 0
-        ? (hotel.ratings.reduce((acc: number, r: {score: number}) => acc + r.score, 0) / hotel.ratings.length).toFixed(1)
+    const avgRating = hotel.reviews && hotel.reviews.length > 0
+        ? (hotel.reviews.reduce((acc: number, r: { score: number }) => acc + r.score, 0) / hotel.reviews.length).toFixed(1)
         : null;
 
-    // Find the user's specific rating if logged in
-    const userRatingItem = session?.user && hotel.ratings 
-        ? hotel.ratings.find((r: {user: string}) => r.user === session.user._id)
+    const existingReview = session?.user && hotel.reviews
+        ? hotel.reviews.find((r: ReviewItem) =>
+            typeof r.user === 'object' ? r.user._id === session.user._id : r.user === session.user._id
+        )
         : null;
-    const userRatingScore = userRatingItem ? userRatingItem.score : 0;
 
     return (
         <main className="max-w-6xl mx-auto px-4 py-8">
@@ -44,7 +44,7 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ hi
                     <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
                         <span className="text-amber-500 text-lg">★</span>
                         <span className="text-lg font-bold text-amber-600">{avgRating}</span>
-                        <span className="text-sm font-normal text-amber-500/80">({hotel.ratings?.length} รีวิว)</span>
+                        <span className="text-sm font-normal text-amber-500/80">({hotel.reviews?.length} รีวิว)</span>
                     </div>
                  )}
             </div>
@@ -83,15 +83,16 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ hi
                     </div>
 
                     {session && (
-                        <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <h3 className="text-sm font-semibold text-gray-700 mb-2">ให้คะแนนโรงแรมนี้</h3>
-                            <StarRating hotelId={hid} initialRating={userRatingScore} />
+                        <div className="mt-4">
+                            <ReviewForm hotelId={hid} existingReview={existingReview} />
                         </div>
                     )}
                 </div>
 
                 <HotelBookingPanel hotelId={hid} hotelName={hotel.name} />
             </div>
+
+            <ReviewList reviews={hotel.reviews} />
         </main>
     );
 }

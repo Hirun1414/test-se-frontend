@@ -15,8 +15,28 @@ interface HotelItem {
         hotel: string;
         score: number;
     }[];
+    reviews?: ReviewItem[];
     __v: number;
     id: string;
+}
+
+interface ReviewItem {
+    _id: string;
+    score: number;
+    comment: string;
+    user: string | {
+        _id: string;
+        name: string;
+        email: string;
+    };
+    hotel?: string | {
+        _id: string;
+        name: string;
+        province: string;
+    };
+    likes?: string[];
+    dislikes?: string[];
+    createdAt: string;
 }
 
 interface HotelJson {
