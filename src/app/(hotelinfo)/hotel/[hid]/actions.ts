@@ -2,33 +2,83 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
-export async function submitRating(hotelId: string, score: number) {
+const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+
+export async function submitReview(hotelId: string, score: number, comment: string) {
     const session = await getServerSession(authOptions);
-    if (!session) return false;
-
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+    if (!session) return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนรีวิว' };
 
     try {
-        const res = await fetch(`${backendUrl}/api/v1/hotels/${hotelId}/ratings`, {
+        const res = await fetch(`${backendUrl}/api/v1/hotels/${hotelId}/reviews`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${session.user.token}`,
             },
-            body: JSON.stringify({ score }),
+            body: JSON.stringify({ score, comment }),
         });
 
+        const data = await res.json();
         if (!res.ok) {
-            console.error('Failed to submit rating:', await res.text());
-            return false;
+            return { success: false, message: data.message || 'ไม่สามารถส่งรีวิวได้' };
         }
 
-        revalidateTag('hotels'); // If we have a cache tag for hotels
-        return true;
+        revalidatePath(`/hotel/${hotelId}`);
+        return { success: true };
     } catch (err) {
-        console.error('Submit rating error:', err);
-        return false;
+        console.error('Submit review error:', err);
+        return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' };
+    }
+}
+
+export async function updateReview(hotelId: string, reviewId: string, score: number, comment: string) {
+    const session = await getServerSession(authOptions);
+    if (!session) return { success: false, message: 'กรุณาเข้าสู่ระบบ' };
+
+    try {
+        const res = await fetch(`${backendUrl}/api/v1/reviews/${reviewId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.user.token}`,
+            },
+            body: JSON.stringify({ score, comment }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            return { success: false, message: data.message || 'ไม่สามารถแก้ไขรีวิวได้' };
+        }
+
+        revalidatePath(`/hotel/${hotelId}`);
+        return { success: true };
+    } catch (err) {
+        console.error('Update review error:', err);
+        return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' };
+    }
+}
+
+export async function deleteReview(hotelId: string, reviewId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session) return { success: false, message: 'กรุณาเข้าสู่ระบบ' };
+
+    try {
+        const res = await fetch(`${backendUrl}/api/v1/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${session.user.token}` },
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            return { success: false, message: data.message || 'ไม่สามารถลบรีวิวได้' };
+        }
+
+        revalidatePath(`/hotel/${hotelId}`);
+        return { success: true };
+    } catch (err) {
+        console.error('Delete review error:', err);
+        return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' };
     }
 }

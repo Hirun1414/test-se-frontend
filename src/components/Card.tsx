@@ -6,16 +6,16 @@ export default function Card({
     imgSrc,
     province,
     dailyrate,
-    ratings,
+    reviews,
 }: {
     hotelName: string;
     imgSrc: string;
     province?: string;
     dailyrate?: number;
-    ratings?: { score: number }[];
+    reviews?: { score: number }[];
 }) {
-    const avgRating = ratings && ratings.length > 0 
-        ? (ratings.reduce((acc, r) => acc + r.score, 0) / ratings.length).toFixed(1)
+    const avgRating = reviews && reviews.length > 0
+        ? (reviews.reduce((acc, r) => acc + r.score, 0) / reviews.length).toFixed(1)
         : null;
 
     return (
