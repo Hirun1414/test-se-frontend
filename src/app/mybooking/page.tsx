@@ -83,9 +83,15 @@ export default async function MyBookingPage() {
                                                     <p className="text-sm font-medium text-gray-800">{service?.name ?? 'บริการไม่ทราบชื่อ'}</p>
                                                     {service?.description && <p className="text-xs text-gray-500">{service.description}</p>}
                                                 </div>
-                                                <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
-                                                    {status}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
+                                                        {entry?.count ?? 1}
+                                                    </span>
+
+                                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
+                                                        {status}
+                                                    </span>
+                                                </div>
                                             </div>
                                         );
                                     })}

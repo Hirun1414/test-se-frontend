@@ -14,6 +14,8 @@ interface Service {
     name: string;
     description: string;
     status: string;
+    min: number;
+    max: number;
 }
 
 export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: string; hotelName: string }) {
@@ -25,6 +27,11 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
     const [done, setDone] = useState(false);
     const [services, setServices] = useState<Service[]>([]);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
+    const [counts, setCounts] = useState<Record<string, number>>({});
+    const servicesWithCount = selectedServices.map(id => ({
+        serviceId: id,
+        quantity: counts[id] ?? services.find(s => s.serviceId === id)?.min ?? 1
+    }));
     const [loadingServices, setLoadingServices] = useState(false);
 
     // Fetch hotel services on mount
@@ -39,7 +46,9 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
                         serviceId: service._id,
                         name: service.name,
                         description: service.description,
-                        status: service.status
+                        status: service.status,
+                        min: service.minQuantity,
+                        max: service.maxQuantity
                     }));
                     setServices(mappedServices);
                 }
@@ -99,7 +108,7 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
         setError('');
         setLoading(true);
         try {
-            await createBooking(hotelId, date.format('YYYY-MM-DD'), selectedServices);
+            await createBooking(hotelId, date.format('YYYY-MM-DD'), servicesWithCount);
             setDone(true);
         } catch (err: any) {
             const msg: string = err.message ?? '';
@@ -112,6 +121,7 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
     };
 
     const selectedServicesList = services.filter(s => selectedServices.includes(s.serviceId));
+
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col h-full">
@@ -156,12 +166,63 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
                                         className="w-4 h-4 mt-1 rounded border-gray-300 text-green-700 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-800">{service.name}</p>
+                                        <p className="text-sm font-medium text-gray-800">{service.name} ({service.max})</p>
                                         <p className="text-xs text-gray-500">{service.description}</p>
                                         {service.status !== 'available' && (
                                             <p className="text-xs text-red-600">ไม่พร้อมให้บริการ</p>
                                         )}
                                     </div>
+                                    {selectedServices.includes(service.serviceId) && (
+                                    <input
+                                        type="number"
+                                        value={
+                                        counts[service.serviceId] !== undefined
+                                            ? counts[service.serviceId]
+                                            : service.min
+                                        }
+
+                                        min={service.min}
+                                        max={service.max}
+
+                                        onChange={(e) => {
+                                            const raw = e.target.value;
+
+                                            if (raw === "") {
+                                                setCounts(prev => {
+                                                const next = { ...prev };
+                                                delete next[service.serviceId];
+                                                return next;
+                                                });
+                                                return;
+                                            }
+
+                                            const val = parseInt(raw, 10);
+
+                                            if (!isNaN(val)) {
+                                                setCounts(prev => ({
+                                                ...prev,
+                                                [service.serviceId]: val
+                                                }));
+                                            }
+                                        }}
+
+                                        onBlur={() => {
+                                            let val = counts[service.serviceId];
+
+                                            if (val === undefined) val = service.min;
+
+                                            if (val < service.min) val = service.min;
+                                            if (val > service.max) val = service.max;
+
+                                            setCounts(prev => ({
+                                                ...prev,
+                                                [service.serviceId]: val
+                                            }));
+                                        }}
+
+                                        className="w-16 h-8 border rounded px-2 text-sm"
+                                    />
+                                    )}
                                 </label>
                             ))}
                         </div>
