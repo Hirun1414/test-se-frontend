@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { Dayjs } from 'dayjs';
 import Link from 'next/link';
 import createBooking from '@/libs/createBooking';
+import getRoomServices from '@/libs/getRoomServices';
 
 interface Service {
     serviceId: string;
@@ -39,8 +40,7 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
         const fetchServices = async () => {
             try {
                 setLoadingServices(true);
-                const response = await fetch(`/api/roomservices/hotel/${hotelId}`);
-                const data = await response.json();
+                const data = await getRoomServices(hotelId);
                 if (data.success && Array.isArray(data.data)) {
                     const mappedServices = data.data.map((service: any) => ({
                         serviceId: service._id,
