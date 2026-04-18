@@ -89,7 +89,9 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ hi
                     )}
                 </div>
 
-                <HotelBookingPanel hotelId={hid} hotelName={hotel.name} />
+                <div className="self-start">
+                    <HotelBookingPanel hotelId={hid} hotelName={hotel.name} />
+                </div>
             </div>
 
             <ReviewList reviews={hotel.reviews} />
