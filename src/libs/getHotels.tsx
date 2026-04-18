@@ -1,5 +1,3 @@
-import { resolve } from "path";
-
 export default async function getHotels() {
 
     /*await new Promise((resolve) => setTimeout(resolve, 2000))*/
