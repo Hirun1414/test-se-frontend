@@ -51,8 +51,18 @@ export default function ReviewForm({
     if (existingReview && !isEditing) {
         return (
             <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold text-gray-700">รีวิวของคุณ</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">รีวิวของคุณ</h3>
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                            <span
+                                key={s}
+                                className={`text-2xl ${s <= existingReview.score ? 'text-amber-400' : 'text-gray-300'}`}
+                            >
+                                ★
+                            </span>
+                        ))}
+                    </div>
                     <div className="flex items-center gap-1.5">
                         <button
                             type="button"
@@ -86,16 +96,6 @@ export default function ReviewForm({
                             ลบ
                         </button>
                     </div>
-                </div>
-                <div className="flex items-center gap-0.5 mb-2">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                        <span
-                            key={s}
-                            className={`text-2xl ${s <= existingReview.score ? 'text-amber-400' : 'text-gray-300'}`}
-                        >
-                            ★
-                        </span>
-                    ))}
                 </div>
                 <p className="text-sm text-gray-600 whitespace-pre-wrap">{existingReview.comment}</p>
                 {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
