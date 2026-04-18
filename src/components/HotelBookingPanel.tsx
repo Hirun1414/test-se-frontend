@@ -32,7 +32,7 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
         const fetchServices = async () => {
             try {
                 setLoadingServices(true);
-                const response = await fetch(`http://localhost:5000/api/v1/roomservices/hotel/${hotelId}`);
+                const response = await fetch(`/api/roomservices/hotel/${hotelId}`);
                 const data = await response.json();
                 if (data.success && Array.isArray(data.data)) {
                     const mappedServices = data.data.map((service: any) => ({
