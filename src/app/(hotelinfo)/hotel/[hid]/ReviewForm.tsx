@@ -77,7 +77,7 @@ export default function ReviewForm({
 
     const canSubmit = comment.trim().length > 0 && score > 0 && !isPending;
     const isDirty = isEditing
-        ? (score !== existingReview?.score || comment.trim() !== existingReview?.comment)
+        ? (score !== existingReview?.score || comment.trim() !== (existingReview?.comment ?? '').trim())
         : true;
 
     const handleSubmit = () => {
@@ -120,7 +120,7 @@ export default function ReviewForm({
                         disabled={isPending}
                         className={`text-2xl transition-colors cursor-pointer focus:outline-none ${(hover || score) >= s ? 'text-amber-400' : 'text-gray-300'
                             }`}
-                        onClick={() => setScore(s === score ? 0 : s)}
+                        onClick={() => setScore(s)}
                         onMouseEnter={() => setHover(s)}
                         onMouseLeave={() => setHover(0)}
                     >

@@ -9,12 +9,6 @@ interface HotelItem {
     picture: string;
     region?: string;
     dailyrate: number;
-    ratings?: {
-        _id: string;
-        user: string;
-        hotel: string;
-        score: number;
-    }[];
     reviews?: ReviewItem[];
     __v: number;
     id: string;
