@@ -27,7 +27,7 @@ export default function Banner() {
             <div className={styles.overlay} />
             <div className={styles.content}>
                 <h1 className={styles.title}>
-                    จองที่พักในฝัน<br />เริ่มต้นที่ Fontyard
+                    จองที่พักในฝัน<br />เริ่มต้นที่ KingOporII
                 </h1>
                 <p className={styles.subtitle}>
                     ค้นหาและจองโรงแรมที่ใช่ได้ง่ายๆ ไม่ว่าจะเป็นการพักผ่อน งานแต่งงาน หรือการเดินทางธุรกิจ

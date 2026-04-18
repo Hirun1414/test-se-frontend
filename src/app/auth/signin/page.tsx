@@ -41,14 +41,14 @@ export default function SigninPage() {
         <div className="min-h-screen bg-[#FAF3E0] flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                 <div className="text-center mb-6">
-                    <span className="text-2xl font-bold text-green-700">Fontyard</span>
+                    <span className="text-2xl font-bold text-green-700">KingOporII</span>
                     <h1 className="text-2xl font-bold text-gray-800 mt-1">เข้าสู่ระบบ</h1>
                 </div>
 
                 <div className="flex justify-center mb-6">
                     <Image
                         src="/img/benecon.jpg"
-                        alt="Fontyard"
+                        alt="KingOporII"
                         width={240}
                         height={240}
                         className="rounded-lg object-cover"

@@ -13,8 +13,8 @@ const sarabun = Sarabun({
 });
 
 export const metadata: Metadata = {
-  title: "Fontyard — จองที่พักออนไลน์",
-  description: "ค้นหาและจองโรงแรมที่ใช่ได้ง่ายๆ กับ Fontyard",
+  title: "KingOporII — จองที่พักออนไลน์",
+  description: "ค้นหาและจองโรงแรมที่ใช่ได้ง่ายๆ กับ KingOporII",
 };
 
 export default async function RootLayout({

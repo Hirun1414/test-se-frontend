@@ -15,7 +15,7 @@ export default function TopMenu() {
                 sizes="120vw"
                 className="h-10 w-auto object-contain rounded-lg"
                 />
-                Fontyard
+                KingOporII
             </Link>
             <TopMenuAuth />
         </nav>
