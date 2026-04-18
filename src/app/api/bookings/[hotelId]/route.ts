@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/authOptions';
 
-const base = () => process.env.BACKEND_URL?.replace(/\/$/, '');
+const base = () => (process.env.BACKEND_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ hotelId: string }> }) {
     const session = await getServerSession(authOptions);

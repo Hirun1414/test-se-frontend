@@ -45,7 +45,7 @@ export default async function MyBookingPage() {
                 </span>
             </div>
             <div className="flex flex-col gap-4">
-                {myBookings.map((b) => (
+                {myBookings.map((b: any) => (
                     <div key={b._id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
@@ -64,6 +64,34 @@ export default async function MyBookingPage() {
                                 </p>
                             </div>
                         </div>
+                        {Array.isArray(b.services) && b.services.length > 0 && (
+                            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                <div className="mb-3 text-sm font-semibold text-gray-700">บริการเสริมที่เลือก</div>
+                                <div className="space-y-3">
+                                    {b.services.map((entry: any, index: number) => {
+                                        const service = entry?.service ? entry.service : entry;
+                                        const status = entry?.status || service?.status || 'pending';
+                                        const badgeColor =
+                                            status === 'done' ? 'bg-green-100 text-green-800' :
+                                            status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                            status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                            'bg-gray-100 text-gray-700';
+
+                                        return (
+                                            <div key={service?._id ?? index} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white border border-gray-200">
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-800">{service?.name ?? 'บริการไม่ทราบชื่อ'}</p>
+                                                    {service?.description && <p className="text-xs text-gray-500">{service.description}</p>}
+                                                </div>
+                                                <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
+                                                    {status}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end gap-2">
                             <EditBookingBtn bookingId={b._id} currentDate={b.apptDate} />
                             <CancelBookingBtn bookingId={b._id} />

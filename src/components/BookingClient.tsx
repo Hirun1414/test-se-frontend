@@ -9,7 +9,7 @@ import createBooking from "@/libs/createBooking";
 
 export default function BookingClient({ hotels }: { hotels: HotelJson }) {
     const urlParams = useSearchParams();
-    const hid = urlParams.get('id');
+    const hid = urlParams?.get('id') || "";
     const selectedHotel = hotels.data.find(v => v._id === hid);
     const router = useRouter();
 

@@ -1,5 +1,5 @@
 export default async function getBookings(token: string): Promise<ApiBookingJson> {
-    const response = await fetch(`${process.env.BACKEND_URL}/api/v1/bookings`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/bookings`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
     });

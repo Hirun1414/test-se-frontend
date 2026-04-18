@@ -1,8 +1,8 @@
-export default async function createBooking(hotelId: string, apptDate: string) {
+export default async function createBooking(hotelId: string, apptDate: string, services: string[] = []) {
     const response = await fetch(`/api/bookings/${hotelId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apptDate }),
+        body: JSON.stringify({ apptDate, services }),
     });
 
     const data = await response.json();
