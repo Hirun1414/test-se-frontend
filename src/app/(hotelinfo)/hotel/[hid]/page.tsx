@@ -18,7 +18,9 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ hi
 
     const existingReview = session?.user && hotel.reviews
         ? hotel.reviews.find((r: ReviewItem) =>
-            typeof r.user === 'object' ? r.user._id === session.user._id : r.user === session.user._id
+            r.user && typeof r.user === 'object'
+                ? r.user._id === session.user._id
+                : r.user === session.user._id
         )
         : null;
 
