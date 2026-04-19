@@ -208,11 +208,7 @@ export default function ReviewForm({
                     </button>
                 ))}
             </div>
-            {score === 0 ? (
-                <p className="text-xs text-gray-400 mb-3">คลิกดาวเพื่อให้คะแนน (1–5)</p>
-            ) : (
-                <div className="mb-3" />
-            )}
+            <div className="mb-3" />
             <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
