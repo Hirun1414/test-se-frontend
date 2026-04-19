@@ -6,6 +6,13 @@ import { useRouter } from 'next/navigation';
 export default function BookingServices({ bookingId, hotelId, services }: { bookingId: string, hotelId: string, services: any[] }) {
     const [isEditing, setIsEditing] = useState(false);
     const [availableServices, setAvailableServices] = useState<any[]>([]);
+    const [counts, setCounts] = useState<Record<string, number>>({});
+    const serviceCountMap = Object.fromEntries(
+        (services || []).map((entry: any) => {
+            const id = entry?.service?._id || entry?.service;
+            return [id, entry?.count ?? entry?.quantity];
+        })
+    );
     const [localServices, setLocalServices] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [pending, startTransition] = useTransition();
@@ -44,9 +51,12 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
                 if (typeof serviceId === 'object' && serviceId && '$oid' in serviceId) {
                     serviceId = serviceId.$oid;
                 }
+
+                const id = entry?.service?._id || entry?.service;
+
                 return {
                     serviceId: serviceId,
-                    quantity: entry?.count || 1
+                    quantity: counts[id] ?? entry?.count ?? entry?.service.minQuantity
                 };
             });
 
@@ -82,12 +92,12 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
         setIsEditing(false);
     };
 
-    const handleCheckboxChange = (serviceId: string, checked: boolean) => {
+    const handleCheckboxChange = (serviceId: string, checked: boolean, quantity: number) => {
         setLocalServices(prev => {
             const newServices = [...prev];
             if (checked) {
                 // Add service
-                newServices.push({ service: serviceId, status: 'pending', count: 1 });
+                newServices.push({ service: serviceId, status: 'pending', count: quantity });
             } else {
                 // Remove service
                 const idx = newServices.findIndex(entry => (entry?.service?._id || entry?.service) === serviceId);
@@ -156,7 +166,7 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
                                         className="w-4 h-4 mt-1 rounded border-gray-300 text-green-700 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                         checked={isChecked}
                                         disabled={pending || service.status !== 'available'}
-                                        onChange={(e) => handleCheckboxChange(service._id, e.target.checked)}
+                                        onChange={(e) => handleCheckboxChange(service._id, e.target.checked, service.minQuantity)}
                                     />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium text-gray-800">
@@ -167,7 +177,57 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
                                             <p className="text-xs text-red-600 mt-1">ไม่พร้อมให้บริการ</p>
                                         )}
                                     </div>
-                                    {/* teammate will implement the quantity input here later */}
+                                    {bookedServiceIds.includes(service._id) && (
+                                    <input
+                                        type="number"
+                                        value={
+                                        counts[service._id] !== undefined
+                                            ? counts[service._id]
+                                            : serviceCountMap?.[service._id] ?? service.minQuantity ?? 1
+                                        }
+
+                                        min={service.minQuantity}
+                                        max={service.maxQuantity}
+
+                                        onChange={(e) => {
+                                            const raw = e.target.value;
+
+                                            if (raw === "") {
+                                                setCounts(prev => {
+                                                const next = { ...prev };
+                                                delete next[service._id];
+                                                return next;
+                                                });
+                                                return;
+                                            }
+
+                                            const val = parseInt(raw, 10);
+
+                                            if (!isNaN(val)) {
+                                                setCounts(prev => ({
+                                                ...prev,
+                                                [service._id]: val
+                                                }));
+                                            }
+                                        }}
+
+                                        onBlur={() => {
+                                            let val = counts[service._id];
+
+                                            if (val === undefined) val = service.minQuantity;
+
+                                            if (val < service.minQuantity) val = service.minQuantity;
+                                            if (val > service.maxQuantity) val = service.maxQuantity;
+
+                                            setCounts(prev => ({
+                                                ...prev,
+                                                [service._id]: val
+                                            }));
+                                        }}
+
+                                        className="w-16 h-8 border rounded px-2 text-sm"
+                                    />
+                                    )}
                                 </label>
                             );
                         })
