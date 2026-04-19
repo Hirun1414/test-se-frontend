@@ -192,7 +192,7 @@ export default function ReviewForm({
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
                 {isEditing ? 'แก้ไขรีวิวของคุณ' : 'เขียนรีวิวโรงแรมนี้'}
             </h3>
-            <div className="flex items-center gap-0.5 mb-3">
+            <div className="flex items-center gap-0.5 mb-1">
                 {[1, 2, 3, 4, 5].map((s) => (
                     <button
                         key={s}
@@ -208,6 +208,11 @@ export default function ReviewForm({
                     </button>
                 ))}
             </div>
+            {score === 0 ? (
+                <p className="text-xs text-gray-400 mb-3">คลิกดาวเพื่อให้คะแนน (1–5)</p>
+            ) : (
+                <div className="mb-3" />
+            )}
             <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -217,7 +222,7 @@ export default function ReviewForm({
                 disabled={isPending}
                 className="w-full text-sm text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-300"
             />
-            {isEditing && comment.trim().length === 0 && (
+            {comment.trim().length === 0 && (comment.length > 0 || isEditing) && (
                 <p className="text-xs text-red-500 mt-1">รีวิวไม่สามารถเว้นว่างได้</p>
             )}
             <div className="flex items-center justify-between mt-2">

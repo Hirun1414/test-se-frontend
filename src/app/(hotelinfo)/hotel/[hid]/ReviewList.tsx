@@ -16,7 +16,7 @@ export default function ReviewList({ reviews }: { reviews?: ReviewItem[] }) {
             </h2>
             <div className="space-y-4">
                 {reviews.map((r) => {
-                    const userName = typeof r.user === 'object' ? r.user.name : 'ผู้ใช้';
+                    const userName = r.user && typeof r.user === 'object' ? r.user.name : 'ผู้ใช้';
                     const initial = userName.charAt(0).toUpperCase();
                     return (
                         <article
