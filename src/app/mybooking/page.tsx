@@ -5,6 +5,7 @@ import getBookings from "@/libs/getBookings";
 import Link from "next/link";
 import CancelBookingBtn from "./CancelBookingBtn";
 import EditBookingBtn from "./EditBookingBtn";
+import BookingServices from "./BookingServices";
 
 export default async function MyBookingPage() {
     const session = await getServerSession(authOptions);
@@ -64,40 +65,7 @@ export default async function MyBookingPage() {
                                 </p>
                             </div>
                         </div>
-                        {Array.isArray(b.services) && b.services.length > 0 && (
-                            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200">
-                                <div className="mb-3 text-sm font-semibold text-gray-700">บริการเสริมที่เลือก</div>
-                                <div className="space-y-3">
-                                    {b.services.map((entry: any, index: number) => {
-                                        const service = entry?.service ? entry.service : entry;
-                                        const status = entry?.status || service?.status || 'pending';
-                                        const badgeColor =
-                                            status === 'done' ? 'bg-green-100 text-green-800' :
-                                            status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                            status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-gray-100 text-gray-700';
-
-                                        return (
-                                            <div key={service?._id ?? index} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white border border-gray-200">
-                                                <div>
-                                                    <p className="text-sm font-medium text-gray-800">{service?.name ?? 'บริการไม่ทราบชื่อ'}</p>
-                                                    {service?.description && <p className="text-xs text-gray-500">{service.description}</p>}
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
-                                                        {entry?.count ?? 1}
-                                                    </span>
-
-                                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
-                                                        {status}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
+                        <BookingServices bookingId={b._id} hotelId={b.hotel?._id ?? b.hotel} services={b.services || []} />
                         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end gap-2">
                             <EditBookingBtn bookingId={b._id} currentDate={b.apptDate} />
                             <CancelBookingBtn bookingId={b._id} />
