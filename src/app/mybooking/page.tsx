@@ -13,7 +13,7 @@ export default async function MyBookingPage() {
 
     const bookings = await getBookings(session.user.token).catch(() => ({ success: false, count: 0, data: [] } as ApiBookingJson));
     // For admin, backend returns ALL bookings — filter to only show the admin's own bookings
-    const myBookings = bookings.data.filter((b) => {
+    const myBookingsRaw = bookings.data.filter((b) => {
         if (!b.hotel?.name) return false;
         if (session.user.role === 'admin') {
             const userId = typeof b.user === 'object' ? b.user?._id : b.user;
@@ -21,6 +21,26 @@ export default async function MyBookingPage() {
         }
         return true;
     });
+
+    const backendUrl = (process.env.BACKEND_URL || 'http://localhost:5000').replace(/\/$/, '');
+    const myBookings = await Promise.all(
+        myBookingsRaw.map(async (b: any) => {
+            const hotelId = b.hotel?._id ?? b.hotel;
+            let availableServices: any[] = [];
+            if (hotelId) {
+                try {
+                    const res = await fetch(`${backendUrl}/api/v1/roomservices/hotel/${hotelId}`, { cache: 'no-store' });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json.data) availableServices = json.data;
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch room services for hotel', hotelId, err);
+                }
+            }
+            return { ...b, availableServices };
+        })
+    );
 
     if (myBookings.length === 0) {
         return (
@@ -65,7 +85,7 @@ export default async function MyBookingPage() {
                                 </p>
                             </div>
                         </div>
-                        <BookingServices bookingId={b._id} hotelId={b.hotel?._id ?? b.hotel} services={b.services || []} />
+                        <BookingServices bookingId={b._id} hotelId={b.hotel?._id ?? b.hotel} services={b.services || []} availableServices={b.availableServices} />
                         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end gap-2">
                             <EditBookingBtn bookingId={b._id} currentDate={b.apptDate} />
                             <CancelBookingBtn bookingId={b._id} />

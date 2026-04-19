@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function BookingServices({ bookingId, hotelId, services }: { bookingId: string, hotelId: string, services: any[] }) {
+export default function BookingServices({ bookingId, hotelId, services, availableServices = [] }: { bookingId: string, hotelId: string, services: any[], availableServices?: any[] }) {
     const [isEditing, setIsEditing] = useState(false);
-    const [availableServices, setAvailableServices] = useState<any[]>([]);
     const [counts, setCounts] = useState<Record<string, number>>({});
     const serviceCountMap = Object.fromEntries(
         (services || []).map((entry: any) => {
@@ -14,30 +13,8 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
         })
     );
     const [localServices, setLocalServices] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
     const [pending, startTransition] = useTransition();
     const router = useRouter();
-
-    const [fetched, setFetched] = useState(false);
-
-    useEffect(() => {
-        if (!hotelId) return;
-        setLoading(true);
-        fetch(`/api/roomservices/hotel/${hotelId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.data) {
-                    setAvailableServices(data.data);
-                }
-                setFetched(true);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setFetched(true);
-                setLoading(false);
-            });
-    }, [hotelId]);
 
     const handleEditClick = () => {
         if (!isEditing) {
@@ -111,8 +88,15 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
     const bookedServiceIds = (isEditing ? localServices : (Array.isArray(services) ? services : []))
         .map(entry => (entry?.service?._id || entry?.service));
 
-    if ((!Array.isArray(services) || services.length === 0) && fetched && availableServices.length === 0) {
-        return null;
+    if ((!Array.isArray(services) || services.length === 0) && availableServices.length === 0) {
+        return (
+            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="mb-3 flex items-center justify-between">
+                    <div className="text-sm font-semibold text-gray-700">บริการเสริมที่เลือก</div>
+                </div>
+                <p className="text-sm text-gray-500">โรงเเรมนี้ไม่มีบริการเสริม</p>
+            </div>
+        );
     }
 
     return (
@@ -132,7 +116,7 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
                         )}
                         <button 
                             onClick={handleEditClick}
-                            disabled={pending || !fetched}
+                            disabled={pending}
                             className={`px-3 py-1 text-xs font-medium border rounded-lg transition-colors disabled:opacity-50 ${
                                 isEditing 
                                 ? 'text-white bg-green-600 border-green-600 hover:bg-green-700'
@@ -147,9 +131,7 @@ export default function BookingServices({ bookingId, hotelId, services }: { book
 
             {isEditing ? (
                 <div className="space-y-3">
-                    {loading ? (
-                        <p className="text-sm text-gray-500 text-center py-4">กำลังโหลดบริการเสริม...</p>
-                    ) : availableServices.length === 0 ? (
+                    {availableServices.length === 0 ? (
                         <p className="text-sm text-gray-500 text-center py-4">ไม่มีบริการเสริมให้เลือก</p>
                     ) : (
                         availableServices.map((service: any) => {
