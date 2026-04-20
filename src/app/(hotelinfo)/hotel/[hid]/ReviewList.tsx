@@ -3,9 +3,11 @@ import ReviewLikeButtons from './ReviewLikeButtons';
 export default function ReviewList({
     reviews,
     currentUserId,
+    isAdmin = false,
 }: {
     reviews?: ReviewItem[];
     currentUserId?: string | null;
+    isAdmin?: boolean;
 }) {
     if (!reviews || reviews.length === 0) {
         return (
@@ -69,6 +71,7 @@ export default function ReviewList({
                                     initialLikes={(r.likes ?? []) as string[]}
                                     initialDislikes={(r.dislikes ?? []) as string[]}
                                     currentUserId={currentUserId ?? null}
+                                    showDislikeCount={isAdmin}
                                 />
                             )}
                         </article>

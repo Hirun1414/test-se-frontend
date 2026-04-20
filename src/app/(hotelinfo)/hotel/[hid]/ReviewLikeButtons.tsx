@@ -9,6 +9,8 @@ interface ReviewLikeButtonsProps {
     initialLikes: string[];
     initialDislikes: string[];
     currentUserId: string | null;
+    /** When false, dislike count is hidden (shown as —). Admin-only visibility. */
+    showDislikeCount?: boolean;
 }
 
 export default function ReviewLikeButtons({
@@ -17,6 +19,7 @@ export default function ReviewLikeButtons({
     initialLikes,
     initialDislikes,
     currentUserId,
+    showDislikeCount = false,
 }: ReviewLikeButtonsProps) {
     const [likes, setLikes] = useState<string[]>(initialLikes);
     const [dislikes, setDislikes] = useState<string[]>(initialDislikes);
@@ -128,7 +131,9 @@ export default function ReviewLikeButtons({
                     <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
                     <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
                 </svg>
-                <span>{dislikes.length}</span>
+                <span>
+                    {showDislikeCount ? dislikes.length : '—'}
+                </span>
             </button>
         </div>
     );
