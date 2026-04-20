@@ -96,7 +96,7 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ hi
                 </div>
             </div>
 
-            <ReviewList reviews={hotel.reviews} />
+            <ReviewList reviews={hotel.reviews} currentUserId={session?.user?._id ?? null} />
         </main>
     );
 }

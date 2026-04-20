@@ -1,4 +1,12 @@
-export default function ReviewList({ reviews }: { reviews?: ReviewItem[] }) {
+import ReviewLikeButtons from './ReviewLikeButtons';
+
+export default function ReviewList({
+    reviews,
+    currentUserId,
+}: {
+    reviews?: ReviewItem[];
+    currentUserId?: string | null;
+}) {
     if (!reviews || reviews.length === 0) {
         return (
             <section className="mt-12">
@@ -16,8 +24,11 @@ export default function ReviewList({ reviews }: { reviews?: ReviewItem[] }) {
             </h2>
             <div className="space-y-4">
                 {reviews.map((r) => {
+                    const userId = r.user && typeof r.user === 'object' ? r.user._id : r.user as string;
                     const userName = r.user && typeof r.user === 'object' ? r.user.name : 'ผู้ใช้';
                     const initial = userName.charAt(0).toUpperCase();
+                    const isOwnReview = currentUserId && userId === currentUserId;
+
                     return (
                         <article
                             key={r._id}
@@ -49,6 +60,17 @@ export default function ReviewList({ reviews }: { reviews?: ReviewItem[] }) {
                                     day: 'numeric',
                                 })}
                             </p>
+
+                            {/* Like/Dislike buttons — hidden on own review */}
+                            {!isOwnReview && (
+                                <ReviewLikeButtons
+                                    reviewId={r._id}
+                                    hotelId={r.hotel as string}
+                                    initialLikes={(r.likes ?? []) as string[]}
+                                    initialDislikes={(r.dislikes ?? []) as string[]}
+                                    currentUserId={currentUserId ?? null}
+                                />
+                            )}
                         </article>
                     );
                 })}
