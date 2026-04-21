@@ -132,7 +132,7 @@ export default function ReviewLikeButtons({
                     <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
                 </svg>
                 <span>
-                    {showDislikeCount ? dislikes.length : '—'}
+                    {showDislikeCount ? dislikes.length : null}
                 </span>
             </button>
         </div>
