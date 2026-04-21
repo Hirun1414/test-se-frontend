@@ -1,28 +1,35 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import getRoomServices from '@/libs/getRoomServices';
 
-export default function RoomServiceDisplay({ hotelId }: { hotelId: string }) {
+
+const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
     const [services, setServices] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const loadServices = async () => {
-            try {
-                setLoading(true);
-                const data = await getRoomServices(hotelId);
-                if (data.success) {
-                    setServices(data.data);
-                }
-            } catch (err) {
-                console.error("Fetch error:", err);
-            } finally {
-                setLoading(false);
+    const loadServices = async () => {
+        if (!hotelId) return;
+        try {
+            setLoading(true);
+            const data = await getRoomServices(hotelId);
+            if (data.success) {
+                setServices(data.data);
             }
-        };
+        } catch (err) {
+            console.error("Fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        if (hotelId) loadServices();
+   
+    useImperativeHandle(ref, () => ({
+        refresh: loadServices
+    }));
+
+    useEffect(() => {
+        loadServices();
     }, [hotelId]);
 
     if (loading) return <div className="text-gray-400 text-sm p-4">กำลังโหลดบริการ...</div>;
@@ -36,19 +43,29 @@ export default function RoomServiceDisplay({ hotelId }: { hotelId: string }) {
                         <div key={service._id} className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
                             <div className="flex justify-between items-center">
                                 <span className="font-medium text-gray-800">{service.name}</span>
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                                    service.status === 'available' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                                }`}>
-                                    {service.status}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-bold text-green-700 text-sm">฿{service.price}</span>
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                                        service.status === 'available' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                                    }`}>
+                                        {service.status || 'available'}
+                                    </span>
+                                </div>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">{service.description}</p>
+                            {service.description && (
+                                <p className="text-xs text-gray-500 mt-1">{service.description}</p>
+                            )}
                         </div>
                     ))
                 ) : (
-                    <p className="text-center text-gray-400 text-sm py-4">ไม่มีข้อมูลบริการ</p>
+                    <p className="text-center text-gray-400 text-sm py-4">ยังไม่มีบริการ</p>
                 )}
             </div>
         </div>
     );
-}
+});
+
+
+RoomServiceList.displayName = "RoomServiceList";
+
+export default RoomServiceList;
