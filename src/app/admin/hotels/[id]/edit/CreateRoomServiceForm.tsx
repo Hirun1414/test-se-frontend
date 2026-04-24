@@ -38,11 +38,10 @@ export default function CreateRoomServiceForm({ hotelId, onCreated }: { hotelId:
         setLoading(true);
 
         try {
-            const res = await fetch(`http://localhost:5000/api/v1/hotels/${hotelId}/roomservices`, {
+            const res = await fetch(`/api/hotels/${hotelId}/roomservices`, {
                 method: "POST",
                 headers: { 
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}` // ส่ง Token ไปให้ Backend
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ 
                     name, 
