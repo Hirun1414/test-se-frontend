@@ -76,8 +76,8 @@ export default function ReviewLikeButtons({
                     inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
                     border transition-all duration-200 select-none
                     ${hasLiked
-                        ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-sm'
-                        : 'bg-white border-gray-200 text-gray-500 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50'
+                        ? 'bg-green-50 border-green-300 text-green-700 shadow-sm'
+                        : 'bg-white border-gray-200 text-gray-500 hover:border-green-200 hover:text-green-600 hover:bg-green-50'
                     }
                     disabled:opacity-50 disabled:cursor-not-allowed
                 `}

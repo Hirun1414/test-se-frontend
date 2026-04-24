@@ -43,12 +43,12 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
                 const data = await getRoomServices(hotelId);
                 if (data.success && Array.isArray(data.data)) {
                     const mappedServices = data.data.map((service: any) => ({
-                        serviceId: service._id,
-                        name: service.name,
-                        description: service.description,
-                        status: service.status,
-                        min: service.minQuantity,
-                        max: service.maxQuantity
+                    serviceId: service._id,
+                    name: service.name,
+                    description: service.description,
+                    status: service.status,
+                     min: service.minAmount ?? 1,    
+                    max: service.maxAmount ?? 10    
                     }));
                     setServices(mappedServices);
                 }
