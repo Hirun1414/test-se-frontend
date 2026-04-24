@@ -47,8 +47,8 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
                     name: service.name,
                     description: service.description,
                     status: service.status,
-                     min: service.minAmount ?? 1,    
-                    max: service.maxAmount ?? 10    
+                     min: service.minQuantity ?? 1,    
+                    max: service.maxQuantity ?? 10    
                     }));
                     setServices(mappedServices);
                 }
@@ -152,11 +152,11 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
                     
                     {loadingServices ? (
                         <p className="text-sm text-gray-500">กำลังโหลดบริการ...</p>
-                    ) : services.length === 0 ? (
+                    ) : services.filter(s => s.status !== 'unavailable').length === 0 ? (
                         <p className="text-sm text-gray-500">ไม่มีบริการเพิ่มเติม</p>
                     ) : (
                         <div className="space-y-2 mb-4">
-                            {services.map((service) => (
+                            {services.filter(s => s.status !== 'unavailable').map((service) => (
                                 <label key={service.serviceId} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
                                     <input
                                         type="checkbox"
@@ -166,11 +166,16 @@ export default function HotelBookingPanel({ hotelId, hotelName }: { hotelId: str
                                         className="w-4 h-4 mt-1 rounded border-gray-300 text-green-700 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-800">{service.name} ({service.max})</p>
-                                        <p className="text-xs text-gray-500">{service.description}</p>
-                                        {service.status !== 'available' && (
-                                            <p className="text-xs text-red-600">ไม่พร้อมให้บริการ</p>
-                                        )}
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <p className="text-sm font-medium text-gray-800">{service.name}</p>
+                                            {service.status === 'available' ? (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">พร้อมให้บริการ</span>
+                                            ) : service.status === 'pending' ? (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">Coming Soon</span>
+                                            ) : null}
+                                        </div>
+                                        <p className="text-xs text-gray-500 mb-1">{service.description}</p>
+                                        <p className="text-[10px] text-gray-400">จำกัดสูงสุด {service.max} รายการต่อการจอง</p>
                                     </div>
                                     {selectedServices.includes(service.serviceId) && (
                                     <input

@@ -11,8 +11,8 @@ import {
 
 const STATUS_OPTIONS = [
   { value: "available", label: "Available" },
-  { value: "pending", label: "Pending" },
-  { value: "unavailable", label: "Unavailable" },
+  { value: "pending", label: "Coming Soon" },
+  { value: "unavailable", label: "Out of Stock" },
 ];
 
 export default function EditRoomServicePage() {
@@ -30,6 +30,7 @@ export default function EditRoomServicePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -44,8 +45,8 @@ export default function EditRoomServicePage() {
           setName(s.name);
           setDescription(s.description);
           setStatus(s.status);
-          setMinAmount(s.minAmount ?? 1);
-          setMaxAmount(s.maxAmount ?? 10);
+          setMinAmount(s.minQuantity ?? 1);
+          setMaxAmount(s.maxQuantity ?? 10);
         } else {
           setError(result.message || "Failed to load room service.");
         }
@@ -81,8 +82,8 @@ export default function EditRoomServicePage() {
           name,
           description,
           status,
-          minAmount,
-          maxAmount,
+          minQuantity: minAmount,
+          maxQuantity: maxAmount,
         }),
       });
 
@@ -99,6 +100,35 @@ export default function EditRoomServicePage() {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      setTimeout(() => setConfirmDelete(false), 3000);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/roomservices/${id}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok && result.success) {
+        alert("ลบบริการเรียบร้อยแล้ว!");
+        router.back();
+      } else {
+        setError(result.message || "Failed to delete room service.");
+      }
+    } catch (err: any) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+      setConfirmDelete(false);
     }
   };
 
@@ -266,6 +296,19 @@ export default function EditRoomServicePage() {
               className="w-full py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-all shadow-sm active:scale-95 disabled:bg-gray-300"
             >
               {loading ? "กำลังบันทึก..." : "ยืนยันการแก้ไข"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={loading}
+              className={`w-full py-3 font-semibold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50 ${
+                confirmDelete 
+                  ? 'bg-red-600 text-white hover:bg-red-700' 
+                  : 'bg-red-50 text-red-600 hover:bg-red-100'
+              }`}
+            >
+              {confirmDelete ? "ยืนยันการลบ (กดอีกครั้ง)" : "ลบบริการนี้"}
             </button>
 
             <button

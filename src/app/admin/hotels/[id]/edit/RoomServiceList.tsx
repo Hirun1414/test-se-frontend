@@ -10,6 +10,12 @@ const statusStyle: Record<string, string> = {
   unavailable: 'bg-red-100 text-red-600',
 };
 
+const statusLabel: Record<string, string> = {
+  available: 'Available',
+  pending: 'Coming Soon',
+  unavailable: 'Out of Stock',
+};
+
 const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
   const router = useRouter();
   const [services, setServices] = useState<any[]>([]);
@@ -35,9 +41,9 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
     loadServices();
   }, [hotelId]);
 
-  const handleDelete = async (serviceId: string, serviceName: string) => {
-    if (!window.confirm(`ต้องการลบบริการ "${serviceName}" ?\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`)) return;
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
+  const handleDelete = async (serviceId: string) => {
     try {
       setDeletingId(serviceId);
       const response = await fetch(`/api/roomservices/${serviceId}`, {
@@ -45,6 +51,7 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
       });
 
       const result = await response.json().catch(() => ({}));
+
       if (!response.ok || !result.success) {
         throw new Error(result.message || 'ไม่สามารถลบบริการได้');
       }
@@ -54,6 +61,16 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
       alert(error.message || 'เกิดข้อผิดพลาดในการลบบริการ');
     } finally {
       setDeletingId(null);
+      setConfirmingId(null);
+    }
+  };
+
+  const onTrashClick = (serviceId: string) => {
+    if (confirmingId === serviceId) {
+      handleDelete(serviceId);
+    } else {
+      setConfirmingId(serviceId);
+      setTimeout(() => setConfirmingId(null), 3000); // reset after 3s
     }
   };
 
@@ -72,7 +89,7 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
                   <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                     statusStyle[service.status] ?? statusStyle.available
                   }`}>
-                    {service.status || 'available'}
+                    {statusLabel[service.status] || 'Available'}
                   </span>
                   <button
                     onClick={() => router.push(`/admin/roomservices/${service._id}/edit`)}
@@ -81,20 +98,24 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
                     แก้ไข
                   </button>
                   <button
-                    onClick={() => handleDelete(service._id, service.name)}
+                    onClick={() => onTrashClick(service._id)}
                     disabled={deletingId === service._id}
-                    className="px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
+                    className={`px-3 py-1.5 text-xs font-medium border rounded-md transition-colors disabled:opacity-50 ${
+                      confirmingId === service._id 
+                      ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' 
+                      : 'text-red-500 border-red-200 hover:bg-red-50'
+                    }`}
                   >
-                    {deletingId === service._id ? 'กำลังลบ...' : 'ลบ'}
+                    {deletingId === service._id ? 'กำลังลบ...' : confirmingId === service._id ? 'ยืนยันการลบ?' : 'ลบ'}
                   </button>
                 </div>
               </div>
               {service.description && (
                 <p className="text-xs text-gray-500 mt-1">{service.description}</p>
               )}
-              {(service.minAmount !== undefined || service.maxAmount !== undefined) && (
+              {(service.minQuantity !== undefined || service.maxQuantity !== undefined) && (
                 <p className="text-xs text-gray-400 mt-1">
-                  จำนวน: {service.minAmount ?? 1} – {service.maxAmount ?? 10}
+                  จำนวน: {service.minQuantity ?? 1} – {service.maxQuantity ?? 10}
                 </p>
               )}
             </div>
