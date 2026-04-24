@@ -14,6 +14,7 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
   const router = useRouter();
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadServices = async () => {
     if (!hotelId) return;
@@ -34,6 +35,28 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
     loadServices();
   }, [hotelId]);
 
+  const handleDelete = async (serviceId: string, serviceName: string) => {
+    if (!window.confirm(`ต้องการลบบริการ "${serviceName}" ?\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`)) return;
+
+    try {
+      setDeletingId(serviceId);
+      const response = await fetch(`/api/roomservices/${serviceId}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'ไม่สามารถลบบริการได้');
+      }
+
+      setServices((prev) => prev.filter((service) => service._id !== serviceId));
+    } catch (error: any) {
+      alert(error.message || 'เกิดข้อผิดพลาดในการลบบริการ');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (loading) return <div className="text-gray-400 text-sm p-4">กำลังโหลดบริการ...</div>;
 
   return (
@@ -51,12 +74,18 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
                   }`}>
                     {service.status || 'available'}
                   </span>
-                  {/* Edit button */}
                   <button
                     onClick={() => router.push(`/admin/roomservices/${service._id}/edit`)}
-                    className="text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
                   >
                     แก้ไข
+                  </button>
+                  <button
+                    onClick={() => handleDelete(service._id, service.name)}
+                    disabled={deletingId === service._id}
+                    className="px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
+                  >
+                    {deletingId === service._id ? 'กำลังลบ...' : 'ลบ'}
                   </button>
                 </div>
               </div>

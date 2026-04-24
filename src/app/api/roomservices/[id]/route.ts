@@ -30,3 +30,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const data = await response.json().catch(() => ({}));
   return NextResponse.json(data, { status: response.status });
 }
+
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const url = `${base()}/api/v1/roomservices/${id}`;
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+  });
+  const data = await response.json().catch(() => ({}));
+  return NextResponse.json(data, { status: response.status });
+}
