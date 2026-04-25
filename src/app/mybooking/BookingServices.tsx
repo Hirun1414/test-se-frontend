@@ -4,10 +4,11 @@ import React, { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function BookingServices({ bookingId, hotelId, services, availableServices = [] }: { bookingId: string, hotelId: string, services: any[], availableServices?: any[] }) {
+    const validServices = (services || []).filter((entry: any) => entry && entry.service);
     const [isEditing, setIsEditing] = useState(false);
     const [counts, setCounts] = useState<Record<string, number>>({});
     const serviceCountMap = Object.fromEntries(
-        (services || []).map((entry: any) => {
+        validServices.map((entry: any) => {
             const id = entry?.service?._id || entry?.service;
             return [id, entry?.count ?? entry?.quantity];
         })
@@ -18,7 +19,7 @@ export default function BookingServices({ bookingId, hotelId, services, availabl
 
     const handleEditClick = () => {
         if (!isEditing) {
-            setLocalServices(Array.isArray(services) ? [...services] : []);
+            setLocalServices([...validServices]);
             setIsEditing(true);
         } else {
             // Save to DB when clicking "เสร็จสิ้น"
@@ -85,10 +86,10 @@ export default function BookingServices({ bookingId, hotelId, services, availabl
     };
 
     // Use localServices for checked state if editing, otherwise original services
-    const bookedServiceIds = (isEditing ? localServices : (Array.isArray(services) ? services : []))
+    const bookedServiceIds = (isEditing ? localServices : validServices)
         .map(entry => (entry?.service?._id || entry?.service));
 
-    if ((!Array.isArray(services) || services.length === 0) && availableServices.length === 0) {
+    if (validServices.length === 0 && availableServices.length === 0) {
         return (
             <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200">
                 <div className="mb-3 flex items-center justify-between">
@@ -217,11 +218,11 @@ export default function BookingServices({ bookingId, hotelId, services, availabl
                 </div>
             ) : (
                 <>
-                {!Array.isArray(services) || services.length === 0 ? (
+                {validServices.length === 0 ? (
                     <p className="text-sm text-gray-500">ยังไม่มีบริการเสริม (กดแก้ไขเพื่อเพิ่ม)</p>
                 ) : (
                     <div className="space-y-3">
-                        {services.map((entry: any, index: number) => {
+                        {validServices.map((entry: any, index: number) => {
                             const service = entry?.service ? entry.service : entry;
                             const status = entry?.status || service?.status || 'pending';
                             const badgeColor =
