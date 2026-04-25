@@ -135,11 +135,12 @@ export default function BookingServices({ bookingId, hotelId, services, availabl
                     {availableServices.length === 0 ? (
                         <p className="text-sm text-gray-500 text-center py-4">ไม่มีบริการเสริมให้เลือก</p>
                     ) : (
-                        availableServices.map((service: any) => {
-                            const isChecked = bookedServiceIds.includes(service._id);
-                            return (
-                                <label 
-                                    key={service._id} 
+                        availableServices
+                            .map((service: any) => {
+                                const isChecked = bookedServiceIds.includes(service._id);
+                                return (
+                                    <label 
+                                        key={service._id} 
                                     className={`flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors ${
                                         pending ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
@@ -148,17 +149,21 @@ export default function BookingServices({ bookingId, hotelId, services, availabl
                                         type="checkbox" 
                                         className="w-4 h-4 mt-1 rounded border-gray-300 text-green-700 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                         checked={isChecked}
-                                        disabled={pending || service.status !== 'available'}
+                                        disabled={pending || (service.status !== 'available' && !isChecked)}
                                         onChange={(e) => handleCheckboxChange(service._id, e.target.checked, service.minQuantity)}
                                     />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-800">
-                                            {service.name} {service.maxQuantity ? `(${service.maxQuantity})` : ''}
-                                        </p>
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <p className="text-sm font-medium text-gray-800">
+                                                {service.name} {service.maxQuantity ? `(${service.maxQuantity})` : ''}
+                                            </p>
+                                            {service.status === 'available' ? (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-600 font-medium">available</span>
+                                            ) : (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">unavailable</span>
+                                            )}
+                                        </div>
                                         <p className="text-xs text-gray-500">{service.description}</p>
-                                        {service.status !== 'available' && (
-                                            <p className="text-xs text-red-600 mt-1">ไม่พร้อมให้บริการ</p>
-                                        )}
                                     </div>
                                     {bookedServiceIds.includes(service._id) && (
                                     <input
@@ -238,11 +243,19 @@ export default function BookingServices({ bookingId, hotelId, services, availabl
                                         {service?.description && <p className="text-xs text-gray-500">{service.description}</p>}
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
+                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${
+                                            status === 'done' || status === 'pending' ? 'bg-green-100 text-green-600' :
+                                            status === 'cancelled' ? 'bg-red-100 text-red-600' :
+                                            'bg-gray-100 text-gray-700'
+                                        }`}>
                                             {entry?.count ?? 1}
                                         </span>
-                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${badgeColor}`}>
-                                            {status}
+                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold ${
+                                            status === 'done' || status === 'pending' ? 'bg-green-100 text-green-600' :
+                                            status === 'cancelled' ? 'bg-red-100 text-red-600' :
+                                            'bg-gray-100 text-gray-700'
+                                        }`}>
+                                            {status === 'pending' ? 'available' : status}
                                         </span>
                                     </div>
                                 </div>

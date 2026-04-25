@@ -6,14 +6,12 @@ import getRoomServices from '@/libs/getRoomServices';
 
 const statusStyle: Record<string, string> = {
   available: 'bg-green-100 text-green-600',
-  pending:   'bg-yellow-100 text-yellow-600',
-  unavailable: 'bg-red-100 text-red-600',
+  pending: 'bg-red-100 text-red-600',
 };
 
 const statusLabel: Record<string, string> = {
-  available: 'Available',
-  pending: 'Coming Soon',
-  unavailable: 'Out of Stock',
+  available: 'available',
+  pending: 'unavailable',
 };
 
 const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
@@ -86,9 +84,8 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-800">{service.name}</span>
                 <div className="flex items-center gap-2">
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                    statusStyle[service.status] ?? statusStyle.available
-                  }`}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${statusStyle[service.status] ?? statusStyle.available
+                    }`}>
                     {statusLabel[service.status] || 'Available'}
                   </span>
                   <button
@@ -100,11 +97,10 @@ const RoomServiceList = forwardRef(({ hotelId }: { hotelId: string }, ref) => {
                   <button
                     onClick={() => onTrashClick(service._id)}
                     disabled={deletingId === service._id}
-                    className={`px-3 py-1.5 text-xs font-medium border rounded-md transition-colors disabled:opacity-50 ${
-                      confirmingId === service._id 
-                      ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' 
-                      : 'text-red-500 border-red-200 hover:bg-red-50'
-                    }`}
+                    className={`px-3 py-1.5 text-xs font-medium border rounded-md transition-colors disabled:opacity-50 ${confirmingId === service._id
+                        ? 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+                        : 'text-red-500 border-red-200 hover:bg-red-50'
+                      }`}
                   >
                     {deletingId === service._id ? 'กำลังลบ...' : confirmingId === service._id ? 'ยืนยันการลบ?' : 'ลบ'}
                   </button>

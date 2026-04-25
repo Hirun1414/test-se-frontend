@@ -10,9 +10,8 @@ import {
 } from "@mui/material";
 
 const STATUS_OPTIONS = [
-  { value: "available", label: "Available" },
-  { value: "pending", label: "Coming Soon" },
-  { value: "unavailable", label: "Out of Stock" },
+  { value: "available", label: "available" },
+  { value: "pending", label: "unavailable" },
 ];
 
 export default function EditRoomServicePage() {
