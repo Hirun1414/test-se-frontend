@@ -26,9 +26,10 @@ export default function ReviewList({
             </h2>
             <div className="space-y-4">
                 {reviews.map((r) => {
-                    const userId = r.user && typeof r.user === 'object' ? r.user._id : r.user as string;
-                    const userName = r.user && typeof r.user === 'object' ? r.user.name : 'ผู้ใช้';
-                    const initial = userName.charAt(0).toUpperCase();
+                    const userId = r.user && typeof r.user === 'object' ? r.user._id : (r.user as string | undefined);
+                    const userName = (r.user && typeof r.user === 'object' ? r.user.name : null) || 'ผู้ใช้';
+                    const initial = userName.charAt(0).toUpperCase() || '?';
+                    const hotelId = typeof r.hotel === 'string' ? r.hotel : (r.hotel?._id ?? '');
                     const isOwnReview = currentUserId && userId === currentUserId;
 
                     return (
@@ -67,7 +68,7 @@ export default function ReviewList({
                             {!isOwnReview && (
                                 <ReviewLikeButtons
                                     reviewId={r._id}
-                                    hotelId={r.hotel as string}
+                                    hotelId={hotelId}
                                     initialLikes={(r.likes ?? []) as string[]}
                                     initialDislikes={(r.dislikes ?? []) as string[]}
                                     currentUserId={currentUserId ?? null}
