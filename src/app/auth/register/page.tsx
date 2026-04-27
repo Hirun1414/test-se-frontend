@@ -16,6 +16,7 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [role, setRole] = useState("user");
     const [showPassword, setShowPassword] = useState(false);
+    const [consent, setConsent] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -30,6 +31,11 @@ export default function RegisterPage() {
 
         if (password.length < 6) {
             setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+            return;
+        }
+
+        if (!consent) {
+            setError("กรุณายอมรับนโยบายความเป็นส่วนตัวก่อนสมัครสมาชิก");
             return;
         }
 
@@ -154,9 +160,41 @@ export default function RegisterPage() {
                         />
                     </div>
 
+                    <details className="group mt-2 px-4 py-3 bg-[#FAF3E0]/60 border border-gray-200 rounded-lg">
+                        <summary className="text-sm font-medium text-gray-700 cursor-pointer select-none flex items-center justify-between hover:text-green-700 marker:hidden [&::-webkit-details-marker]:hidden">
+                            <span>นโยบายความเป็นส่วนตัว</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform duration-200"
+                            >
+                                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                            </svg>
+                        </summary>
+                        <ul className="mt-3 text-xs text-gray-600 space-y-1.5 list-disc pl-4 leading-relaxed">
+                            <li>เก็บชื่อ เบอร์โทร อีเมล เพื่อการสมัคร ยืนยันตัวตน และการจอง</li>
+                            <li>รหัสผ่านถูก hash ก่อนจัดเก็บ ทีมงานดูไม่ได้</li>
+                            <li>ไม่เปิดเผยต่อบุคคลที่สาม ยกเว้นที่กฎหมายกำหนด</li>
+                            <li>เก็บข้อมูลตราบเท่าที่บัญชียังใช้งาน หรือจนกว่าจะร้องขอให้ลบ</li>
+                        </ul>
+                    </details>
+
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            checked={consent}
+                            onChange={(e) => setConsent(e.target.checked)}
+                            className="mt-0.5 w-4 h-4 accent-green-700 cursor-pointer flex-shrink-0"
+                        />
+                        <span className="text-sm text-gray-700 leading-snug">
+                            ฉันได้อ่านและ<span className="font-medium text-gray-800">ยินยอม</span>ให้ระบบจัดเก็บและประมวลผลข้อมูลส่วนบุคคลของฉันตามนโยบายความเป็นส่วนตัวข้างต้น
+                        </span>
+                    </label>
+
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || !consent}
                         className="mt-2 w-full py-2.5 bg-green-700 text-white font-semibold rounded-lg hover:bg-green-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm"
                     >
                         {loading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}
