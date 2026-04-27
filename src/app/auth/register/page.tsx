@@ -160,23 +160,32 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    <div className="mt-3 flex gap-3 px-3.5 py-3 bg-gray-50 border border-gray-200 rounded-lg">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="flex-shrink-0 w-4 h-4 mt-0.5 text-green-700"
-                            aria-hidden="true"
-                        >
-                            <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
-                        </svg>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-800 mb-1">การคุ้มครองข้อมูลส่วนบุคคล (PDPA)</p>
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                                ระบบจัดเก็บชื่อ เบอร์โทร และอีเมลเพื่อใช้ยืนยันตัวตนและให้บริการจองที่พักเท่านั้น รหัสผ่านถูกเข้ารหัสก่อนจัดเก็บ และจะไม่เปิดเผยต่อบุคคลภายนอก ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562
-                            </p>
-                        </div>
-                    </div>
+                    <details className="group mt-3 px-3.5 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                        <summary className="flex items-center gap-3 cursor-pointer select-none marker:hidden [&::-webkit-details-marker]:hidden">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                className="flex-shrink-0 w-4 h-4 text-green-700"
+                                aria-hidden="true"
+                            >
+                                <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
+                            </svg>
+                            <span className="flex-1 text-xs font-semibold text-gray-800">การคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                className="flex-shrink-0 w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform duration-200"
+                                aria-hidden="true"
+                            >
+                                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                            </svg>
+                        </summary>
+                        <p className="mt-2 pl-7 text-xs text-gray-600 leading-relaxed">
+                            ระบบจัดเก็บชื่อ เบอร์โทร และอีเมลเพื่อใช้ยืนยันตัวตนและให้บริการจองที่พักเท่านั้น รหัสผ่านถูกเข้ารหัสก่อนจัดเก็บ และจะไม่เปิดเผยต่อบุคคลภายนอก ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562
+                        </p>
+                    </details>
 
                     <label className="flex items-start gap-2.5 cursor-pointer select-none">
                         <input
@@ -209,4 +218,3 @@ export default function RegisterPage() {
         </div>
     );
 }
-
