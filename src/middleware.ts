@@ -14,12 +14,13 @@ export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
 
   const backendOrigin = process.env.BACKEND_URL?.trim();
+  const isDev = process.env.NODE_ENV === "development";
 
   const cspHeader = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'", // required for MUI / Emotion
-    "img-src 'self' data: blob: https://drive.google.com https:",
+    "img-src 'self' data: blob: https://drive.google.com",
     "font-src 'self' data:",
     backendOrigin
       ? `connect-src 'self' ${backendOrigin}`
