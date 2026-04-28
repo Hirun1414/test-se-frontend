@@ -12,26 +12,37 @@ function isAuthProtectedPath(pathname: string) {
 
 export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const backendOrigin = process.env.BACKEND_URL || "http://localhost:5000";
+  const backendOrigin = process.env.BACKEND_URL?.trim();
+  const hostname = request.nextUrl.hostname;
+  const useRelaxedDevCsp =
+    hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+
+  const scriptSrc = useRelaxedDevCsp
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : [
+        "script-src 'self'",
+        `'nonce-${nonce}'`,
+        "'sha256-OBTN3RiyCV4Bq7dFqZ5a2pAXjnCcCYeTJMO2I/LYKeo='",
+        "'sha256-qODEg14l7xZdFNMFtnhrbIZVzKyDaWa55MwzqBQXt2E='",
+        "'sha256-xpDrpzpTn2tdXq6E+e9CIqF3y8M5x6nKEgUOhJYTu7M='",
+        "'sha256-g9jw4FPByfNOq5VGNsOvDbi4Vn4mZe8BWc/D40Nx4eM='",
+        "'sha256-EQFH5gNLTpO0xm8NTwaiY2mh/6yLAiSipUxwuYKBp2A='",
+        "'sha256-PuOR+LZBqrKb4ePpBB6hBCpSuljEq9ohELpHi6j0q8g='",
+        "'sha256-VYyKTXy5HaLVE7BeKFdiRJzza7OtcslsnhHhTDCInEA='",
+        "'sha256-i/k9dNlim2bw/P4uBE6H5TkwSixGtVIyDp1QCZNZnrE='",
+      ].join(" ");
+
+  const styleSrc = useRelaxedDevCsp
+    ? "style-src 'self' 'unsafe-inline'"
+    : `style-src 'self' 'nonce-${nonce}'`;
 
   const cspHeader = [
     "default-src 'self'",
-    [
-      "script-src 'self'",
-      `'nonce-${nonce}'`,
-      "'sha256-OBTN3RiyCV4Bq7dFqZ5a2pAXjnCcCYeTJMO2I/LYKeo='",
-      "'sha256-qODEg14l7xZdFNMFtnhrbIZVzKyDaWa55MwzqBQXt2E='",
-      "'sha256-xpDrpzpTn2tdXq6E+e9CIqF3y8M5x6nKEgUOhJYTu7M='",
-      "'sha256-g9jw4FPByfNOq5VGNsOvDbi4Vn4mZe8BWc/D40Nx4eM='",
-      "'sha256-EQFH5gNLTpO0xm8NTwaiY2mh/6yLAiSipUxwuYKBp2A='",
-      "'sha256-PuOR+LZBqrKb4ePpBB6hBCpSuljEq9ohELpHi6j0q8g='",
-      "'sha256-VYyKTXy5HaLVE7BeKFdiRJzza7OtcslsnhHhTDCInEA='",
-      "'sha256-i/k9dNlim2bw/P4uBE6H5TkwSixGtVIyDp1QCZNZnrE='",
-    ].join(" "),
-    `style-src 'self' 'nonce-${nonce}'`,
+    scriptSrc,
+    styleSrc,
     "img-src 'self' data: blob: https://drive.google.com",
     "font-src 'self'",
-    `connect-src 'self' ${backendOrigin}`,
+    backendOrigin ? `connect-src 'self' ${backendOrigin}` : "connect-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
