@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BACKEND_URL=https://fe-project-be-chi.vercel.app/
+        - FRONTEND_URL=http://localhost:3000
+        - NEXTAUTH_URL=http://localhost:3000
+        - NEXTAUTH_SECRET=Ey7nTKnggBc0bRN8WUjyShw2qzOZ6KW4fUyqcKBePxY=
+    container_name: fe-frontend
+    ports:
+      - "3000:3000"
+    # env_file removed to mimic .env.local not existing
+    environment:
+      - BACKEND_URL=https://fe-project-be-chi.vercel.app/
+      - FRONTEND_URL=http://localhost:3000
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=Ey7nTKnggBc0bRN8WUjyShw2qzOZ6KW4fUyqcKBePxY=
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
