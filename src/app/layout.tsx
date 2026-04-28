@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "ค้นหาและจองโรงแรมที่ใช่ได้ง่ายๆ กับ KingOporII",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
