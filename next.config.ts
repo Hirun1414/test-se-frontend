@@ -1,33 +1,65 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
-  remotePatterns: [
-    {
-      protocol: 'https',
-      hostname: 'drive.google.com',
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "drive.google.com",
       },
     ],
   },
+
   async headers() {
-        return [
-            {
-                // matching all API routes
-                source: "/hotel/:path*",
-                headers: [
-                    { key: "Access-Control-Allow-Credentials", value: "true" },
-                    { key: "Access-Control-Allow-Origin", value: "*" }, // replace this your actual origin
-                    { key: "Access-Control-Allow-Methods", value: "GET,DELETE,PATCH,POST,PUT" },
-                    { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
-                ]
-            }
-        ]
-    },
-    env: {
-        FRONTEND_URL: process.env.FRONTEND_URL,
-        BACKEND_URL: process.env.BACKEND_URL
-    }
+    const backendOrigin = process.env.BACKEND_URL || "http://localhost:5000";
+
+    return [
+      {
+        // Apply to every frontend route so the scanner sees the headers on "/"
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self'",
+              "style-src 'self'",
+              "img-src 'self' data: blob: https://drive.google.com",
+              "font-src 'self'",
+              `connect-src 'self' ${backendOrigin}`,
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "frame-src 'none'",
+              "media-src 'self'",
+              "manifest-src 'self'",
+              "worker-src 'self'",
+              "script-src-attr 'none'",
+              "style-src-attr 'none'",
+            ].join("; "),
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "no-referrer",
+          },
+        ],
+      },
+    ];
+  },
+
+  env: {
+    FRONTEND_URL: process.env.FRONTEND_URL,
+    BACKEND_URL: process.env.BACKEND_URL,
+  },
 };
 
 export default nextConfig;
