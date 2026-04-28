@@ -16,7 +16,18 @@ export async function middleware(request: NextRequest) {
 
   const cspHeader = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    [
+      "script-src 'self'",
+      `'nonce-${nonce}'`,
+      "'sha256-OBTN3RiyCV4Bq7dFqZ5a2pAXjnCcCYeTJMO2I/LYKeo='",
+      "'sha256-qODEg14l7xZdFNMFtnhrbIZVzKyDaWa55MwzqBQXt2E='",
+      "'sha256-xpDrpzpTn2tdXq6E+e9CIqF3y8M5x6nKEgUOhJYTu7M='",
+      "'sha256-g9jw4FPByfNOq5VGNsOvDbi4Vn4mZe8BWc/D40Nx4eM='",
+      "'sha256-EQFH5gNLTpO0xm8NTwaiY2mh/6yLAiSipUxwuYKBp2A='",
+      "'sha256-PuOR+LZBqrKb4ePpBB6hBCpSuljEq9ohELpHi6j0q8g='",
+      "'sha256-VYyKTXy5HaLVE7BeKFdiRJzza7OtcslsnhHhTDCInEA='",
+      "'sha256-i/k9dNlim2bw/P4uBE6H5TkwSixGtVIyDp1QCZNZnrE='",
+    ].join(" "),
     `style-src 'self' 'nonce-${nonce}'`,
     "img-src 'self' data: blob: https://drive.google.com",
     "font-src 'self'",
