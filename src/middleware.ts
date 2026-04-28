@@ -12,28 +12,25 @@ function isAuthProtectedPath(pathname: string) {
 
 export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const backendOrigin = process.env.BACKEND_URL?.trim();
-  const scriptSrc = `script-src 'self' 'nonce-${nonce}'`;
 
-  const styleSrc = `style-src 'self' 'nonce-${nonce}'`;
+  const backendOrigin = process.env.BACKEND_URL?.trim();
 
   const cspHeader = [
     "default-src 'self'",
-    scriptSrc,
-    styleSrc,
-    "img-src 'self' data: blob: https://drive.google.com",
-    "font-src 'self'",
-    backendOrigin ? `connect-src 'self' ${backendOrigin}` : "connect-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "style-src 'self' 'unsafe-inline'", // required for MUI / Emotion
+    "img-src 'self' data: blob: https://drive.google.com https:",
+    "font-src 'self' data:",
+    backendOrigin
+      ? `connect-src 'self' ${backendOrigin}`
+      : "connect-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "frame-src 'none'",
     "media-src 'self'",
     "manifest-src 'self'",
     "worker-src 'self'",
-    "script-src-attr 'none'",
-    "style-src-attr 'none'",
   ].join("; ");
 
   const requestHeaders = new Headers(request.headers);
@@ -46,6 +43,7 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  // auth guard
   if (isAuthProtectedPath(request.nextUrl.pathname)) {
     const token = await getToken({
       req: request,
@@ -55,16 +53,15 @@ export async function middleware(request: NextRequest) {
     if (!token) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
-      response = NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(loginUrl);
     }
   }
 
   response.headers.set("Content-Security-Policy", cspHeader);
+
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
